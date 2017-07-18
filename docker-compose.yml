@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+    mysql:
+        image: mysql
+        container_name: mysql
+        volumes:
+            - "./docker/mysql:/var/lib/mysql"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: mydb
+            MYSQL_USER: user
+            MYSQL_PASSWORD: pass
+    php:
+        build: docker/php
+        container_name: php
+        links:
+            - mysql
+        volumes:
+            - ./backend:/var/www/symfony
+            - ./docker/logs/symfony:/var/www/symfony/app/logs
+    nginx:
+        build: docker/nginx
+        container_name: nginx
+        ports:
+            - 80:80
+        volumes_from:
+            - php
+        volumes:
+            - ./docker/logs/nginx/:/var/log/nginx
